@@ -2,12 +2,14 @@ import { useEffect } from "react"
 import { useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import axiosClient from "../axios-client"
+import { useStateContext } from "../contexts/ContextProvider";
 
 export default function UserForm(){
   const {id} = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState(null)
+  const [errors, setErrors] = useState(null);
+  const {setNotification} = useStateContext();
   const [user, setUser] = useState({
     id: null,
     name: '',
@@ -35,7 +37,7 @@ export default function UserForm(){
     if(user.id){
       axiosClient.put(`/users/${user.id}`, user)
         .then(() => {
-          //TODO show notification
+          setNotification('User was successfully updated!');
           navigate('/users')
         })
         .catch(err => {
@@ -48,7 +50,7 @@ export default function UserForm(){
     }else{
       axiosClient.post(`/users`, user)
         .then(() => {
-          //TODO show notification
+          setNotification('User was successfully created!');
           navigate('/users')
         })
         .catch(err => {
@@ -79,7 +81,7 @@ export default function UserForm(){
         {!loading &&
           <form onSubmit={onSubmit}>
             <input value={user.name} onChange={ev => setUser({...user, name: ev.target.value})} placeholder="Name" />
-            <inpu type='email' value={user.email} onChange={ev => setUser({...user, email: ev.target.value})} placeholder="Email" />
+            <input type='email' value={user.email} onChange={ev => setUser({...user, email: ev.target.value})} placeholder="Email" />
             <input type="password" onChange={ev => setUser({...user, password: ev.target.value})} placeholder="Password" />
             <input type="password" onChange={ev => setUser({...user, password_confirmation: ev.target.value})} placeholder="Password Confirmation" />
             <button className="btn">Save</button>
